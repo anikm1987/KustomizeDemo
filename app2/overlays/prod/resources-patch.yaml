@@ -1,0 +1,17 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kustomizedemo
+spec:
+  replicas: 3
+  template:
+    spec:
+      containers:
+      - name: main
+        resources:
+          limits:
+            cpu: '1'
+            memory: 512Gi
+          requests:
+            cpu: '0.3'
+            memory: 256Mi

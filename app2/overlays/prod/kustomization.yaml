@@ -1,0 +1,41 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+# Can be referenced from github
+# - https://github.com/aniket-a-mukherjee/DO180-apps.git?ref=v1.0.0
+resources:
+- ../staging
+# Update namespace for staging deployment
+namespace: kustomizedemo-prod
+
+# Applies common annotations to all files
+commonAnnotations:
+  support: +prod-env
+
+# adding name suffix
+nameSuffix: -b
+# adding prefix
+namePrefix: app2
+
+# Changing image for production
+images:
+- name: aniket/kustomizedemo
+  newTag: v2.1.0
+
+# Applies common labels to all files
+labels:
+- includeSelectors: true
+  pairs:
+    env: prod
+
+# Changes nodeport to ClusterIp
+patches:
+- path: cluster-ip.json
+  target:
+    kind: Service
+    name: kustomizedemo
+    version: v1
+
+
+# Patch resource limit and replica count
+patchesStrategicMerge:
+  - resources-patch.yaml

@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kustomizedemo
+  labels:
+    app: kustomizedemo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kustomizedemo
+  template:
+    metadata:
+      labels:
+        app: kustomizedemo
+    spec:
+      serviceAccountName: kustomizedemo
+      containers:
+      - name: main
+        image: aniket/kustomizedemo:v0.0.1-snapshot
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: 80
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        readinessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /
+            port: 80
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        resources:
+          limits:
+            cpu: '0.5'
+            memory: 256Gi
+          requests:
+            cpu: '0.1'
+            memory: 128Mi
+        volumeMounts:
+          - name: kustomizedemo
+            subPath: nginx.conf
+            mountPath: /etc/nginx/nginx.conf
+      volumes:
+        - name: kustomizedemo
+          configMap:
+            name: kustomizedemo

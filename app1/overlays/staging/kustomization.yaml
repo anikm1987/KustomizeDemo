@@ -1,0 +1,32 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ../dev
+# Can be referenced from github
+# - https://github.com/aniket-a-mukherjee/DO180-apps.git?ref=v1.0.0
+
+# Update namespace for staging deployment
+namespace: kustomizedemo-staging
+
+# Applies common labels to all files
+commonLabels:
+  env: staging
+
+# Applies common annotations to all files
+commonAnnotations:
+  support: '+491234567'
+
+
+# Merge config map genereated in dev and add additional block of config
+# also merge application.properties
+configMapGenerator:
+  - name: kustomizedemo
+    behavior: merge
+    files:
+    - nginx-config/health.conf 
+  - name: app1-properties
+    behavior: merge
+    files:
+     - config/config.properties
+    # literals:
+    # - JAVA_HOME=/opt/java/jdk
